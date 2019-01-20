@@ -39,7 +39,7 @@
 #ifndef __FONTS_H
 #define __FONTS_H
 
-/*最大字体等距更纱48 (32x80) */
+/*最大字体等距更纱72 (32x80) */
 #define MAX_HEIGHT_FONT         80
 #define MAX_WIDTH_FONT          32
 #define OFFSET_BITMAP           
@@ -79,7 +79,8 @@ typedef struct
   
 }cFONT;
 
-extern sFONT Font48;
+extern sFONT Font80;
+extern sFONT Font46;
 extern sFONT Font24;
 extern sFONT Font20;
 extern sFONT Font16;
