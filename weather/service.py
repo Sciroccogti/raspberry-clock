@@ -3,12 +3,19 @@ import json
 
 def GetWeatherInfo():
     '''返回fore和now'''
-    urlfore = "https://restapi.amap.com/v3/weather/weatherInfo?city=320115&key=2f84cf79e4e4e7b7b055fdb65bdb7d2c&extensions=all"
-    urlnow = "https://restapi.amap.com/v3/weather/weatherInfo?city=320115&key=2f84cf79e4e4e7b7b055fdb65bdb7d2c&extensions=base"
+    urlip = "https://restapi.amap.com/v3/ip?key=2f84cf79e4e4e7b7b055fdb65bdb7d2c"
+    try:
+        respond = requests.get(urlip)
+        locate = json.loads(respond.text)
+        adcode = locate['adcode']
+    except:
+        adcode = 320115 # 南京
+    urlfore = "https://restapi.amap.com/v3/weather/weatherInfo?city=%s&key=2f84cf79e4e4e7b7b055fdb65bdb7d2c&extensions=all" % adcode
+    urlnow = "https://restapi.amap.com/v3/weather/weatherInfo?city=%s&key=2f84cf79e4e4e7b7b055fdb65bdb7d2c&extensions=base" % adcode
     # 昆山：320583
     try:
         respond = requests.get(urlfore)
-        fore = json.loads(respond.text)
+        locate = json.loads(respond.text)
         # print(fore)
         respond = requests.get(urlnow)
         now = json.loads(respond.text)
@@ -16,7 +23,7 @@ def GetWeatherInfo():
         # #将JSON编码的字符串转换回Python数据结构
         # output result of json
         # print(data)
-        return fore, now
+        return locate, now
     except:
         return None, None
 
