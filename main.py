@@ -23,9 +23,9 @@ def fun_timer():
     newimage = time_image.crop([48, 50, 12, 50])
     time_image.paste(newimage, (0,0))
     epd.display(epd.getbuffer(time_image))
-    global timer
-    timer = threading.Timer(1, fun_timer)
-    timer.start()
+    # global timer
+    # timer = threading.Timer(1, fun_timer)
+    # timer.start()
 
 try:
     logging.info("raspberry clock")
@@ -39,9 +39,11 @@ try:
     time_image = Image.new('1', (epd2in9.EPD_HEIGHT, epd2in9.EPD_WIDTH), 255)
     time_draw = ImageDraw.Draw(time_image)
 
-    timer = threading.Timer(1, fun_timer)
-    timer.start()
-    # while (True):
+    # timer = threading.Timer(1, fun_timer)
+    # timer.start()
+    while (True):
+        fun_timer()
+        time.sleep(1)
         
 
     logging.info("Clear...")
