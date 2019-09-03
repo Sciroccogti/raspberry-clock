@@ -14,6 +14,8 @@ from waveshare import epd2in9
 #     sys.path.append(libdir)
 
 def DisplayTime():
+    time_image = Image.new('1', (epd2in9.EPD_HEIGHT, epd2in9.EPD_WIDTH), 255)
+    time_draw = ImageDraw.Draw(time_image)
     time_draw.rectangle((0, 0, 120, 50), fill = 255)
     time_draw.text((0, 0), time.strftime('%H:%M'), font = font48, fill = 0)
     newimage = time_image.crop([0, 0, 120, 50])
@@ -21,10 +23,12 @@ def DisplayTime():
     epd.display(epd.getbuffer(time_image))
 
 def Twinkle():
-    time_draw.rectangle((48, 50, 12, 50), fill = 255)
-    newimage = time_image.crop([48, 50, 12, 50])
-    time_image.paste(newimage, (0,0))
-    epd.display(epd.getbuffer(time_image))
+    twinkle_image = Image.new('1', (12, 50), 255)
+    twinkle_draw = ImageDraw.Draw(twinkle_image)
+    twinkle_draw.rectangle((48, 50, 12, 50), fill = 255)
+    # newimage = twinkle_image.crop([48, 50, 12, 50])
+    twinkle_image.paste(twinkle_image, (48, 50))
+    epd.display(epd.getbuffer(twinkle_image))
     # global timer
     # timer = threading.Timer(1, fun_timer)
     # timer.start()
@@ -38,8 +42,6 @@ try:
     font48 = ImageFont.truetype('/usr/share/fonts/truetype/wqy/wqy-microhei.ttc', 48)
     font24 = ImageFont.truetype('/usr/share/fonts/truetype/wqy/wqy-microhei.ttc', 24)
     font18 = ImageFont.truetype('/usr/share/fonts/truetype/wqy/wqy-microhei.ttc', 18)
-    time_image = Image.new('1', (epd2in9.EPD_HEIGHT, epd2in9.EPD_WIDTH), 255)
-    time_draw = ImageDraw.Draw(time_image)
 
     # timer = threading.Timer(1, fun_timer)
     # timer.start()
@@ -62,6 +64,7 @@ except IOError as e:
 
 except KeyboardInterrupt:    
     logging.info("ctrl + c:")
+    epd.Clear(0xFF)
     epd.sleep()
     exit()
 
