@@ -38,6 +38,7 @@ try:
 
     epd.sleep()
 
-except:
-    print('traceback.format_exc():\n%s',traceback.format_exc())
+except KeyboardInterrupt:    
+    logging.info("ctrl + c:")
+    epd2in9.epdconfig.module_exit()
     exit()
