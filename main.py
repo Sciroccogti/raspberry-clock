@@ -38,9 +38,9 @@ def DisplayTime():
 
 
 try:
-    logging.info("raspberry clock")
+    print("raspberry clock")
     epd = epd2in9.EPD()
-    logging.info("init and Clear")
+    print("init and Clear")
     epd.init(epd.lut_partial_update)
     epd.Clear(0xFF)
     font48 = ImageFont.truetype('/usr/share/fonts/truetype/wqy/wqy-microhei.ttc', 48) # 数字宽度25，半角宽度12
@@ -49,20 +49,22 @@ try:
 
     # timer = threading.Timer(1, fun_timer)
     # timer.start()
+    print("Display time...")
     while (True):
         DisplayTime()
         # if int(time.strftime('%H')) > 20:
         #     GPIO.output(4, GPIO.HIGH)#BCM
         #if int(time.strftime('%S')) <= 1 and int(time.strftime('%M')) <= 0: # 整点
         if True:
+            print("Fetch weather...")
             fore, now = GetWeatherInfo()
             weather = now['lives'][0]['weather']
-            '''if abs(int(time.strftime('%H')) - 12) < 6:  # 白天
-                weather = now['lives'][0]['dayweather']
+            if abs(int(time.strftime('%H')) - 12) < 6:  # 白天
+                forecast = now['lives'][0]['dayweather']
             else:  # 晚上
-                weather = now['lives'][0]['nightweather']
-            '''
-            image = Image.new('1', (epd.height, epd.width), 255)
+                forecast = now['lives'][0]['nightweather']
+            print("Display weather...")
+            image = Image.new('1', (80, 80), 255)
             bmp = Image.open(os.path.join('bmp', WEATHER[weather]))
             bmp.thumbnail((80, 80))
             image.paste(bmp, (0, 48))
@@ -73,18 +75,20 @@ try:
         # time.sleep(0.5)
         
 
-    logging.info("Clear...")
+    print("Clear...")
     epd.init(epd.lut_full_update)
     epd.Clear(0xFF)
     
-    logging.info("Goto Sleep...")
+    print("Goto Sleep...")
     epd.sleep()
 
 except IOError as e:
-    logging.info(e)
+    print(e)
 
 except KeyboardInterrupt:    
-    logging.info("ctrl + c:")
-    epd.Clear(0xFF)
+    print("ctrl + c:")
+    epd.init(epd.lut_full_update)
+    epd.Clear(0xFF)    
+    print("Goto Sleep...")
     epd.sleep()
     exit()
