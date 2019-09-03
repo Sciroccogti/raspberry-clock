@@ -50,8 +50,17 @@ try:
     # timer = threading.Timer(1, fun_timer)
     # timer.start()
     print("Display time...")
+    image = Image.new('1', (epd.height, epd.width), 255)
+    draw = ImageDraw.Draw(image)
     while (True):
-        DisplayTime()
+        if int(time.strftime('%S')) // 2 == 0:
+            draw.rectangle((0, 0, 115, 48), fill = 255)
+            draw.text((0, 0), time.strftime('%H:%M'), font = font48, fill = 0)
+            newimage = image.crop([0, 0, 115, 50])
+            image.paste(newimage, (0,0))
+        else:
+            draw.rectangle((50, 0, 62, 48), fill = 255)
+        
         # if int(time.strftime('%H')) > 20:
         #     GPIO.output(4, GPIO.HIGH)#BCM
         #if int(time.strftime('%S')) <= 1 and int(time.strftime('%M')) <= 0: # 整点
@@ -65,11 +74,10 @@ try:
             else:  # 晚上
                 forecast = fore['forecasts'][0]['casts'][0]['nightweather']
             print("Display weather...")
-            image = Image.new('1', (80, 80), 255)
             bmp = Image.open(os.path.join('bmp', WEATHER[weather]))
             bmp.thumbnail((80, 80))
             image.paste(bmp, (0, 48))
-            epd.display(epd.getbuffer(image))
+        epd.display(epd.getbuffer(image))
         
         time.sleep(0.2)
         # Twinkle()
