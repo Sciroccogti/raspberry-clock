@@ -15,6 +15,8 @@ from weather.service import GetWeatherInfo
 # if os.path.exists(libdir):
 #     sys.path.append(libdir)
 
+print("raspberrypi clock")
+
 WEATHER = {u"小雨": "WXYU.BMP", u"中雨": "WZYU.BMP", u"大雨": "WDYU.BMP", u"暴雨": "WWET.BMP",
            u"晴": "WQING.BMP", u"多云": "WDYZQ.BMP", u"阴": "WYIN.BMP",
            u"雷阵雨": "WLZYU.BMP", u"阵雨": "WYGTQ.BMP",
@@ -23,22 +25,7 @@ WEATHER = {u"小雨": "WXYU.BMP", u"中雨": "WZYU.BMP", u"大雨": "WDYU.BMP", 
            u"月亮": "WMOON.BMP", u"深夜": "WSLEEP.BMP", u"日落": "SUMSET.BMP", u"日出": "SUNRISE.BMP"}
 
 
-def DisplayTime():
-    time_image = Image.new('1', (epd.height, epd.width), 255)
-    time_draw = ImageDraw.Draw(time_image)
-    time_draw.rectangle((0, 0, 115, 48), fill = 255)
-    time_draw.text((0, 0), time.strftime('%H:%M'), font = font48, fill = 0)
-    newimage = time_image.crop([0, 0, 115, 50])
-    time_image.paste(newimage, (0,0))
-    epd.display(epd.getbuffer(time_image))
-
-    time.sleep(0.2)
-    time_draw.rectangle((50, 0, 62, 48), fill = 255)
-    epd.display(epd.getbuffer(time_image))
-
-
 try:
-    print("raspberry clock")
     epd = epd2in9.EPD()
     print("init and Clear")
     epd.init(epd.lut_partial_update)
@@ -49,23 +36,27 @@ try:
 
     # timer = threading.Timer(1, fun_timer)
     # timer.start()
-    print("Display time...")
     image = Image.new('1', (epd.height, epd.width), 255)
     draw = ImageDraw.Draw(image)
+    firsttime = True
+    firstweather = True
     while (True):
-        if int(time.strftime('%S')) // 2 == 0:
+        print("Display Time...")
+        if int(time.strftime('%S')) % 2 == 0 or firsttime:
+        #if True:
             draw.rectangle((0, 0, 115, 48), fill = 255)
             draw.text((0, 0), time.strftime('%H:%M'), font = font48, fill = 0)
             newimage = image.crop([0, 0, 115, 50])
             image.paste(newimage, (0,0))
+            firsttime = False
         else:
             draw.rectangle((50, 0, 62, 48), fill = 255)
         
         # if int(time.strftime('%H')) > 20:
         #     GPIO.output(4, GPIO.HIGH)#BCM
-        #if int(time.strftime('%S')) <= 1 and int(time.strftime('%M')) <= 0: # 整点
-        if True:
+        if ((int(time.strftime('%S')) <= 1 and int(time.strftime('%M')) <= 0) or firstweather): # 整点
             print("Fetch weather...")
+            firstweather = False
             fore, now = GetWeatherInfo()
             weather = now['lives'][0]['weather']
             print(weather)
@@ -79,7 +70,7 @@ try:
             image.paste(bmp, (0, 48))
         epd.display(epd.getbuffer(image))
         
-        time.sleep(0.2)
+        time.sleep(1)
         # Twinkle()
         # time.sleep(0.5)
         
