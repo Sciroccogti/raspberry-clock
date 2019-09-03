@@ -9,18 +9,20 @@ def GetWeatherInfo():
     try:
         respond = requests.get(urlfore)
         fore = json.loads(respond.text)
+        # print(fore)
         respond = requests.get(urlnow)
         now = json.loads(respond.text)
+        # print(now)
         # #将JSON编码的字符串转换回Python数据结构
         # output result of json
         # print(data)
-        return fore, now['live'][0]
+        return fore, now
     except:
         return None, None
 
 if __name__ == "__main__":
     fore, now = GetWeatherInfo()
-    a = fore['forecasts'][0]['casts']
-    # print(a[0])
-    b = now['lives'][0]
-    print(b)
+    #a = fore['forecasts'][0]['casts']
+    print(fore)
+    #b = now['lives'][0]
+    print(now)

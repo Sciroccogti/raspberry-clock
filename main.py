@@ -53,12 +53,15 @@ try:
         DisplayTime()
         # if int(time.strftime('%H')) > 20:
         #     GPIO.output(4, GPIO.HIGH)#BCM
-        if int(time.strftime('%S')) <= 1 and int(time.strftime('%M')) <= 0: # 整点
+        #if int(time.strftime('%S')) <= 1 and int(time.strftime('%M')) <= 0: # 整点
+        if True:
             fore, now = GetWeatherInfo()
-            if abs(int(time.strftime('%H')) - 12) < 6:  # 白天
-                weather = now['dayweather']
+            weather = now['lives'][0]['weather']
+            '''if abs(int(time.strftime('%H')) - 12) < 6:  # 白天
+                weather = now['lives'][0]['dayweather']
             else:  # 晚上
-                weather = now['nightweather']
+                weather = now['lives'][0]['nightweather']
+            '''
             image = Image.new('1', (epd.height, epd.width), 255)
             bmp = Image.open(os.path.join('bmp', WEATHER[weather]))
             bmp.thumbnail((80, 80))
