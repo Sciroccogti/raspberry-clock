@@ -46,8 +46,8 @@ try:
     # timer.start()
     image = Image.new('1', (epd.height, epd.width), 255)
     draw = ImageDraw.Draw(image)
-    firstweather = True
     lastmin = -1
+    lasthour = -1
     while (True):
         sec = int(time.strftime('%S'))
         min = int(time.strftime('%M'))
@@ -69,9 +69,9 @@ try:
             epd.Clear(0xFF)
             epd.init(epd.lut_partial_update)
 
-        if ((sec <= 1 and min <= 0) or firstweather): # 整点
+        if lasthour != hour: # 整点
             print("Fetch weather...")
-            firstweather = False
+            lasthour = hour
             fore, now = GetWeatherInfo()
             weather = now['lives'][0]['weather']
             print(weather)
