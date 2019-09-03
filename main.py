@@ -1,10 +1,21 @@
-import epd2in9
+# -*- coding:utf-8 -*-
+import sys
+import os
+import logging
 import time
 from PIL import Image,ImageDraw,ImageFont
 import traceback
 
+from waveshare.epd2in9 import epd2in9
+# picdir = os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), 'pic')
+# libdir = os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), 'lib')
+# if os.path.exists(libdir):
+#     sys.path.append(libdir)
+
 try:
+    logging.info("raspberry clock")
     epd = epd2in9.EPD()
+    logging.info("init and Clear")
     epd.init(epd.lut_partial_update)
     epd.Clear(0xFF)
     font48 = ImageFont.truetype('/usr/share/fonts/truetype/wqy/wqy-microhei.ttc', 48)
