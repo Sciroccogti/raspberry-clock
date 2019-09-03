@@ -59,10 +59,11 @@ try:
             print("Fetch weather...")
             fore, now = GetWeatherInfo()
             weather = now['lives'][0]['weather']
+            print(weather)
             if abs(int(time.strftime('%H')) - 12) < 6:  # 白天
-                forecast = now['lives'][0]['dayweather']
+                forecast = fore['forecasts'][0]['casts'][0]['dayweather']
             else:  # 晚上
-                forecast = now['lives'][0]['nightweather']
+                forecast = fore['forecasts'][0]['casts'][0]['nightweather']
             print("Display weather...")
             image = Image.new('1', (80, 80), 255)
             bmp = Image.open(os.path.join('bmp', WEATHER[weather]))
