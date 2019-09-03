@@ -6,15 +6,19 @@ def GetWeatherInfo():
     # 昆山：320583
     try:
         respond = requests.get(urlfore)
-        data = json.loads(respond.text)
+        fore = json.loads(respond.text)
+        respond = requests.get(urlnow)
+        now = json.loads(respond.text)
         # #将JSON编码的字符串转换回Python数据结构
         # output result of json
         # print(data)
-        return data
+        return fore, now
     except:
-        return None
+        return None, None
 
 if __name__ == "__main__":
-    data = GetWeatherInfo()
-    a = data['forecasts'][0]['casts']
-    print(a[0])
+    fore, now = GetWeatherInfo()
+    a = fore['forecasts'][0]['casts']
+    # print(a[0])
+    b = now['lives'][0]
+    print(b)

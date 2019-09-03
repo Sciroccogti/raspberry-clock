@@ -9,6 +9,7 @@ import threading
 import RPi.GPIO as GPIO
 
 from waveshare import epd2in9
+from weather.service import 
 # picdir = os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), 'pic')
 # libdir = os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), 'lib')
 # if os.path.exists(libdir):
@@ -17,14 +18,14 @@ from waveshare import epd2in9
 def DisplayTime():
     time_image = Image.new('1', (epd2in9.EPD_HEIGHT, epd2in9.EPD_WIDTH), 255)
     time_draw = ImageDraw.Draw(time_image)
-    time_draw.rectangle((0, 0, 100, 50), fill = 255)
+    time_draw.rectangle((0, 0, 115, 48), fill = 255)
     time_draw.text((0, 0), time.strftime('%H:%M'), font = font48, fill = 0)
-    newimage = time_image.crop([0, 0, 120, 50])
+    newimage = time_image.crop([0, 0, 115, 50])
     time_image.paste(newimage, (0,0))
     epd.display(epd.getbuffer(time_image))
 
     time.sleep(0.2)
-    time_draw.rectangle((50, 0, 60, 50), fill = 255)
+    time_draw.rectangle((50, 0, 62, 48), fill = 255)
     epd.display(epd.getbuffer(time_image))
 
 
@@ -34,7 +35,7 @@ try:
     logging.info("init and Clear")
     epd.init(epd.lut_partial_update)
     epd.Clear(0xFF)
-    font48 = ImageFont.truetype('/usr/share/fonts/truetype/wqy/wqy-microhei.ttc', 48)
+    font48 = ImageFont.truetype('/usr/share/fonts/truetype/wqy/wqy-microhei.ttc', 48) # 数字宽度25，半角宽度12
     font24 = ImageFont.truetype('/usr/share/fonts/truetype/wqy/wqy-microhei.ttc', 24)
     font18 = ImageFont.truetype('/usr/share/fonts/truetype/wqy/wqy-microhei.ttc', 18)
 
