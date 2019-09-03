@@ -42,32 +42,55 @@ try:
     firstweather = True
     while (True):
         print("Display Time...")
-        if int(time.strftime('%S')) % 2 == 0 or firsttime:
+        sec = int(time.strftime('%S'))
+        min = int(time.strftime('%M'))
+        hour = int(time.strftime('%H'))
+        if sec % 2 == 0 or firsttime:
         #if True:
             draw.rectangle((0, 0, 115, 48), fill = 255)
-            draw.text((0, 0), time.strftime('%H:%M'), font = font48, fill = 0)
+            draw.text((0, 0), '%s:%s' % (hour, min), font = font48, fill = 0)
             newimage = image.crop([0, 0, 115, 50])
             image.paste(newimage, (0,0))
             firsttime = False
         else:
             draw.rectangle((50, 0, 62, 48), fill = 255)
         
-        # if int(time.strftime('%H')) > 20:
+        # if hour > 20:
         #     GPIO.output(4, GPIO.HIGH)#BCM
-        if ((int(time.strftime('%S')) <= 1 and int(time.strftime('%M')) <= 0) or firstweather): # 整点
+        if hour % 6 == 0 and min <= 0 and sec <= 1:  # 每六小时刷新屏幕
+            print("Clear...")
+            epd.init(epd.lut_full_update)
+            epd.Clear(0xFF)
+            epd.init(epd.lut_partial_update)
+
+        if ((sec <= 1 and min <= 0) or firstweather): # 整点
             print("Fetch weather...")
             firstweather = False
             fore, now = GetWeatherInfo()
             weather = now['lives'][0]['weather']
             print(weather)
-            if abs(int(time.strftime('%H')) - 12) < 6:  # 白天
-                forecast = fore['forecasts'][0]['casts'][0]['dayweather']
+            if abs(hour - 12) < 6:  # 白天
+                cast1 = fore['forecasts'][0]['casts'][0]['nightweather']
+                name1 = '今晚'
+                cast2 = fore['forecasts'][0]['casts'][1]['dayweather']
+                name2 = '明天'
             else:  # 晚上
-                forecast = fore['forecasts'][0]['casts'][0]['nightweather']
+                cast1 = fore['forecasts'][0]['casts'][1]['dayweather']
+                name1 = '明天'
+                cast2 = fore['forecasts'][0]['casts'][2]['dayweather']
+                name2 = '后天'
             print("Display weather...")
             bmp = Image.open(os.path.join('bmp', WEATHER[weather]))
             bmp.thumbnail((80, 80))
             image.paste(bmp, (0, 48))
+            bmp = Image.open(os.path.join('bmp', WEATHER[cast1]))
+            bmp.thumbnail((62, 62))
+            image.paste(bmp, (80, 48))
+            draw.text((80, 110), name1, font = font18, fill = 0)
+            bmp = Image.open(os.path.join('bmp', WEATHER[cast2]))
+            bmp.thumbnail((62, 62))
+            image.paste(bmp, (142, 48))
+            draw.text((142, 110), name2, font = font18, fill = 0)
         epd.display(epd.getbuffer(image))
         
         time.sleep(1)
