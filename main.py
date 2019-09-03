@@ -6,7 +6,7 @@ import time
 from PIL import Image,ImageDraw,ImageFont
 import traceback
 
-from waveshare.epd2in9 import epd2in9
+from waveshare import epd2in9
 # picdir = os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), 'pic')
 # libdir = os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), 'lib')
 # if os.path.exists(libdir):
@@ -36,7 +36,15 @@ try:
 #        time_image.paste(newimage, (0,0))
 #        epd.display(epd.getbuffer(time_image))
 
+    logging.info("Clear...")
+    epd.init(epd.lut_full_update)
+    epd.Clear(0xFF)
+    
+    logging.info("Goto Sleep...")
     epd.sleep()
+
+except IOError as e:
+    logging.info(e)
 
 except KeyboardInterrupt:    
     logging.info("ctrl + c:")
