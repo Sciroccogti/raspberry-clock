@@ -6,6 +6,7 @@ import time
 from PIL import Image,ImageDraw,ImageFont
 import traceback
 import threading
+import RPi.GPIO as GPIO
 
 from waveshare import epd2in9
 # picdir = os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), 'pic')
@@ -16,13 +17,14 @@ from waveshare import epd2in9
 def DisplayTime():
     time_image = Image.new('1', (epd2in9.EPD_HEIGHT, epd2in9.EPD_WIDTH), 255)
     time_draw = ImageDraw.Draw(time_image)
-    time_draw.rectangle((0, 0, 120, 50), fill = 255)
+    time_draw.rectangle((0, 0, 100, 50), fill = 255)
     time_draw.text((0, 0), time.strftime('%H:%M'), font = font48, fill = 0)
     newimage = time_image.crop([0, 0, 120, 50])
     time_image.paste(newimage, (0,0))
     epd.display(epd.getbuffer(time_image))
+
     time.sleep(0.2)
-    time_draw.rectangle((48, 0, 60, 50), fill = 255)
+    time_draw.rectangle((50, 0, 60, 50), fill = 255)
     epd.display(epd.getbuffer(time_image))
 
 
@@ -40,6 +42,11 @@ try:
     # timer.start()
     while (True):
         DisplayTime()
+        # if int(time.strftime('%H')) > 20:
+        #     GPIO.output(4, GPIO.HIGH)#BCM
+        if int(time.strftime('%M')) <= 0:
+            epd.Clear(0xFF)
+
         time.sleep(0.2)
         # Twinkle()
         # time.sleep(0.5)
@@ -60,7 +67,3 @@ except KeyboardInterrupt:
     epd.Clear(0xFF)
     epd.sleep()
     exit()
-
-
-
-
