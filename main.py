@@ -30,9 +30,16 @@ try:
     print("init and Clear")
     epd.init(epd.lut_partial_update)
     epd.Clear(0xFF)
-    font48 = ImageFont.truetype('/usr/share/fonts/truetype/wqy/wqy-microhei.ttc', 48) # 数字宽度25，半角宽度12
-    font24 = ImageFont.truetype('/usr/share/fonts/truetype/wqy/wqy-microhei.ttc', 24)
-    font18 = ImageFont.truetype('/usr/share/fonts/truetype/wqy/wqy-microhei.ttc', 18)
+    font12 = ImageFont.truetype('Font.ttc', 12)
+    font18 = ImageFont.truetype('Font.ttc', 18)
+    font24 = ImageFont.truetype('Font.ttc', 24)
+    font36 = ImageFont.truetype('Font.ttc', 36)
+    font48 = ImageFont.truetype('Font.ttc', 48)
+    font60 = ImageFont.truetype('Font.ttc', 60)
+    font72 = ImageFont.truetype('Font.ttc', 72)
+    # font48 = ImageFont.truetype('/usr/share/fonts/truetype/wqy/wqy-microhei.ttc', 48) # 数字宽度25，半角宽度12
+    # font24 = ImageFont.truetype('/usr/share/fonts/truetype/wqy/wqy-microhei.ttc', 24)
+    # font18 = ImageFont.truetype('/usr/share/fonts/truetype/wqy/wqy-microhei.ttc', 18)
 
     # timer = threading.Timer(1, fun_timer)
     # timer.start()
@@ -47,10 +54,10 @@ try:
         hour = int(time.strftime('%H'))
         if sec % 2 == 0 or firsttime:
         #if True:
-            draw.rectangle((0, 0, 115, 48), fill = 255)
-            draw.text((0, 0), '%s:%s' % (hour, min), font = font48, fill = 0)
-            newimage = image.crop([0, 0, 115, 50])
-            image.paste(newimage, (0,0))
+            draw.rectangle((176, 4, 296, 124), fill = 255)
+            draw.text((0, 0), '%s:%s' % (hour, min), font = font60, fill = 0)
+            newimage = image.crop((176, 4, 296, 124))
+            image.paste(newimage, (176, 4))
             firsttime = False
         else:
             draw.rectangle((50, 0, 62, 48), fill = 255)
