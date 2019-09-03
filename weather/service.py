@@ -1,6 +1,8 @@
 import requests
 import json
+
 def GetWeatherInfo():
+    '''返回fore和now'''
     urlfore = "https://restapi.amap.com/v3/weather/weatherInfo?city=320115&key=2f84cf79e4e4e7b7b055fdb65bdb7d2c&extensions=all"
     urlnow = "https://restapi.amap.com/v3/weather/weatherInfo?city=320115&key=2f84cf79e4e4e7b7b055fdb65bdb7d2c&extensions=base"
     # 昆山：320583
@@ -12,7 +14,7 @@ def GetWeatherInfo():
         # #将JSON编码的字符串转换回Python数据结构
         # output result of json
         # print(data)
-        return fore, now
+        return fore, now['live'][0]
     except:
         return None, None
 
