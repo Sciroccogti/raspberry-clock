@@ -13,12 +13,14 @@ from waveshare import epd2in9
 # if os.path.exists(libdir):
 #     sys.path.append(libdir)
 
-def fun_timer():
+def DisplayTime():
     time_draw.rectangle((0, 0, 120, 50), fill = 255)
     time_draw.text((0, 0), time.strftime('%H:%M'), font = font48, fill = 0)
     newimage = time_image.crop([0, 0, 120, 50])
     time_image.paste(newimage, (0,0))
     epd.display(epd.getbuffer(time_image))
+
+def Twinkle():
     time_draw.rectangle((48, 50, 12, 50), fill = 255)
     newimage = time_image.crop([48, 50, 12, 50])
     time_image.paste(newimage, (0,0))
@@ -42,8 +44,10 @@ try:
     # timer = threading.Timer(1, fun_timer)
     # timer.start()
     while (True):
-        fun_timer()
-        time.sleep(1)
+        DisplayTime()
+        time.sleep(0.5)
+        Twinkle()
+        time.sleep(0.5)
         
 
     logging.info("Clear...")
@@ -58,6 +62,7 @@ except IOError as e:
 
 except KeyboardInterrupt:    
     logging.info("ctrl + c:")
+    epd.sleep()
     epd2in9.epdconfig.module_exit()
     exit()
 
