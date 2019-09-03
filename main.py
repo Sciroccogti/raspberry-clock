@@ -53,7 +53,7 @@ try:
         sec = int(time.strftime('%S'))
         min = int(time.strftime('%M'))
         hour = int(time.strftime('%H'))
-        if sec == 0 or firsttime:
+        if sec <= 5 or firsttime:
             print("Display Time...")
             draw.rectangle((0, 0, 71, 128), fill = 0)
             draw.text((4, 4), '%02d' % hour, font = font60, fill = 255)
