@@ -46,21 +46,20 @@ try:
     # timer.start()
     image = Image.new('1', (epd.height, epd.width), 255)
     draw = ImageDraw.Draw(image)
-    firsttime = True
     firstweather = True
-
+    lastmin = -1
     while (True):
         sec = int(time.strftime('%S'))
         min = int(time.strftime('%M'))
         hour = int(time.strftime('%H'))
-        if sec <= 5 or firsttime:
+        if min != lastmin:
             print("Display Time...")
             draw.rectangle((0, 0, 71, 128), fill = 0)
             draw.text((4, 4), '%02d' % hour, font = font60, fill = 255)
             draw.text((4, 64), '%02d' % min, font = font60, fill = 255)
             newimage = image.crop((0, 0, 71, 128))
             image.paste(newimage, (0, 0))
-            firsttime = False
+            lastmin = min
         
         # if hour > 20:
         #     GPIO.output(4, GPIO.HIGH)#BCM
