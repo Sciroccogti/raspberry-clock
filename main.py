@@ -21,13 +21,17 @@ def DisplayTime():
     newimage = time_image.crop([0, 0, 120, 50])
     time_image.paste(newimage, (0,0))
     epd.display(epd.getbuffer(time_image))
+    time.sleep(0.5)
+    newimage = time_draw.rectangle((48, 0, 60, 50), fill = 255)
+    time_image.paste(newimage, (0, 0))
+    epd.display(epd.getbuffer(time_image))
 
 def Twinkle():
     twinkle_image = Image.new('1', (12, 50), 255)
     twinkle_draw = ImageDraw.Draw(twinkle_image)
-    twinkle_draw.rectangle((48, 50, 12, 50), fill = 255)
+    # twinkle_draw.rectangle((48, 50, 12, 50), fill = 255)
     # newimage = twinkle_image.crop([48, 50, 12, 50])
-    twinkle_image.paste(twinkle_image, (48, 50))
+    twinkle_image.paste(twinkle_image, (48, 0))
     epd.display(epd.getbuffer(twinkle_image))
     # global timer
     # timer = threading.Timer(1, fun_timer)
@@ -48,8 +52,8 @@ try:
     while (True):
         DisplayTime()
         time.sleep(0.5)
-        Twinkle()
-        time.sleep(0.5)
+        # Twinkle()
+        # time.sleep(0.5)
         
 
     logging.info("Clear...")
