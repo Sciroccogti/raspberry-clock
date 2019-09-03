@@ -63,7 +63,6 @@ except IOError as e:
 except KeyboardInterrupt:    
     logging.info("ctrl + c:")
     epd.sleep()
-    epd2in9.epdconfig.module_exit()
     exit()
 
 
