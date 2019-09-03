@@ -32,6 +32,7 @@ font36 = ImageFont.truetype(path + '/Font.ttc', 36)
 font48 = ImageFont.truetype(path + '/Font.ttc', 48)
 font60 = ImageFont.truetype(path + '/Font.ttc', 60)
 font72 = ImageFont.truetype(path + '/Font.ttc', 72)
+fon48 = ImageFont.truetype(path + '/4fun.ttf', 48)
 
 try:
     epd = epd2in9.EPD()
@@ -54,10 +55,12 @@ try:
         hour = int(time.strftime('%H'))
         if min != lastmin:
             print("Display Time...")
-            draw.rectangle((0, 0, 71, 128), fill = 0)
-            draw.text((4, 4), '%02d' % hour, font = font60, fill = 255)
-            draw.text((4, 64), '%02d' % min, font = font60, fill = 255)
-            newimage = image.crop((0, 0, 71, 128))
+            newimage = Image.new('1', (110, 40), 255)
+            newdraw = ImageDraw.Draw(newimage)
+            newdraw.rectangle((1, 0, 108, 44), fill = 255)
+            newdraw.text((0, 0), '%02d %02d' % (hour, min), font = fon48, fill = 0)
+            #newdraw.text((0, 60), '%02d' % min, font = fon48, fill = 255)
+            newimage = newimage.resize((216, 96))
             image.paste(newimage, (0, 0))
             lastmin = min
         
@@ -80,6 +83,11 @@ try:
                 name1 = '今晚'
                 cast2 = fore['forecasts'][0]['casts'][1]['dayweather']
                 name2 = '明天'
+            elif hour <= 6:
+                cast1 = fore['forecasts'][0]['casts'][0]['dayweather']
+                name1 = '今早'
+                cast2 = fore['forecasts'][0]['casts'][0]['nightweather']
+                name2 = '今晚'
             else:  # 晚上
                 cast1 = fore['forecasts'][0]['casts'][1]['dayweather']
                 name1 = '明天'
@@ -88,15 +96,15 @@ try:
             print("Display weather...")
             bmp = Image.open(os.path.join(path + '/bmp', WEATHER[weather]))
             bmp.thumbnail((80, 80))
-            image.paste(bmp, (72, 0))
+            image.paste(bmp, (216, 0))
             bmp = Image.open(os.path.join(path + '/bmp', WEATHER[cast1]))
             bmp.thumbnail((36, 36))
-            image.paste(bmp, (74, 80))
-            draw.text((80, 116), name1, font = font12, fill = 0)
+            image.paste(bmp, (218, 80))
+            draw.text((224, 116), name1, font = font12, fill = 0)
             bmp = Image.open(os.path.join(path + '/bmp', WEATHER[cast2]))
             bmp.thumbnail((36, 36))
-            image.paste(bmp, (114, 80))
-            draw.text((120, 116), name2, font = font12, fill = 0)
+            image.paste(bmp, (258, 80))
+            draw.text((264, 116), name2, font = font12, fill = 0)
         epd.display(epd.getbuffer(image))
         
         time.sleep(1)
