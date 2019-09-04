@@ -25,14 +25,19 @@ WEATHER = {u"小雨": "WXYU.BMP", u"中雨": "WZYU.BMP", u"大雨": "WDYU.BMP", 
            u"雪": "WXUE.BMP", u"雨夹雪": "WYJX.BMP", u"冰雹": "WBBAO.BMP",
            u"月亮": "WMOON.BMP", u"深夜": "WSLEEP.BMP", u"日落": "SUMSET.BMP", u"日出": "SUNRISE.BMP"}
 
-font12 = ImageFont.truetype(path + '/Font.ttc', 12)
-font18 = ImageFont.truetype(path + '/Font.ttc', 18)
-font24 = ImageFont.truetype(path + '/Font.ttc', 24)
-font36 = ImageFont.truetype(path + '/Font.ttc', 36)
-font48 = ImageFont.truetype(path + '/Font.ttc', 48)
-font60 = ImageFont.truetype(path + '/Font.ttc', 60)
-font72 = ImageFont.truetype(path + '/Font.ttc', 72)
-fon48 = ImageFont.truetype(path + '/4fun.ttf', 48)
+text = ''
+
+try:
+    font12 = ImageFont.truetype(path + '/Font.ttc', 12)
+    # font18 = ImageFont.truetype(path + '/Font.ttc', 18)
+    font24 = ImageFont.truetype(path + '/Font.ttc', 24)
+    # font36 = ImageFont.truetype(path + '/Font.ttc', 36)
+    # font48 = ImageFont.truetype(path + '/Font.ttc', 48)
+    # font60 = ImageFont.truetype(path + '/Font.ttc', 60)
+    # font72 = ImageFont.truetype(path + '/Font.ttc', 72)
+    font48 = ImageFont.truetype(path + '/4fun.ttf', 48)
+except Exception as error:
+    text += '%s' % error
 
 try:
     epd = epd2in9.EPD()
@@ -58,8 +63,8 @@ try:
             newimage = Image.new('1', (110, 40), 255)
             newdraw = ImageDraw.Draw(newimage)
             newdraw.rectangle((1, 0, 108, 44), fill = 255)
-            newdraw.text((0, 0), '%02d %02d' % (hour, min), font = fon48, fill = 0)
-            #newdraw.text((0, 60), '%02d' % min, font = fon48, fill = 255)
+            newdraw.text((0, 0), '%02d %02d' % (hour, min), font = font48, fill = 0)
+            #newdraw.text((0, 60), '%02d' % min, font = font48, fill = 255)
             newimage = newimage.resize((216, 96))
             image.paste(newimage, (0, 0))
             lastmin = min
@@ -75,42 +80,55 @@ try:
         if lasthour != hour: # 整点
             print("Fetch weather...")
             lasthour = hour
-            fore, now = GetWeatherInfo()
-            weather = now['lives'][0]['weather']
-            print(weather)
-            if abs(hour - 12) < 6:  # 白天
-                cast1 = fore['forecasts'][0]['casts'][0]['nightweather']
-                name1 = '今晚'
-                cast2 = fore['forecasts'][0]['casts'][1]['dayweather']
-                name2 = '明天'
-            elif hour <= 6:
-                cast1 = fore['forecasts'][0]['casts'][0]['dayweather']
-                name1 = '今早'
-                cast2 = fore['forecasts'][0]['casts'][0]['nightweather']
-                name2 = '今晚'
-            else:  # 晚上
-                cast1 = fore['forecasts'][0]['casts'][1]['dayweather']
-                name1 = '明天'
-                cast2 = fore['forecasts'][0]['casts'][2]['dayweather']
-                name2 = '后天'
-            print("Display weather...")
-            bmp = Image.open(os.path.join(path + '/bmp', WEATHER[weather]))
-            bmp.thumbnail((80, 80))
-            image.paste(bmp, (216, 0))
-            bmp = Image.open(os.path.join(path + '/bmp', WEATHER[cast1]))
-            bmp.thumbnail((36, 36))
-            image.paste(bmp, (218, 80))
-            draw.text((224, 116), name1, font = font12, fill = 0)
-            bmp = Image.open(os.path.join(path + '/bmp', WEATHER[cast2]))
-            bmp.thumbnail((36, 36))
-            image.paste(bmp, (258, 80))
-            draw.text((264, 116), name2, font = font12, fill = 0)
+            fore, now, weathertext = GetWeatherInfo()
+            text += weathertext
+            if text == '':  # 输出天气
+                weather = now['lives'][0]['weather']
+                print(weather)
+
+                if abs(hour - 12) < 6:  # 白天
+                    cast1 = fore['forecasts'][0]['casts'][0]['nightweather']
+                    name1 = '今晚'
+                    cast2 = fore['forecasts'][0]['casts'][1]['dayweather']
+                    name2 = '明天'
+                elif hour <= 6:
+                    cast1 = fore['forecasts'][0]['casts'][0]['dayweather']
+                    name1 = '今早'
+                    cast2 = fore['forecasts'][0]['casts'][0]['nightweather']
+                    name2 = '今晚'
+                else:  # 晚上
+                    cast1 = fore['forecasts'][0]['casts'][1]['dayweather']
+                    name1 = '明天'
+                    cast2 = fore['forecasts'][0]['casts'][2]['dayweather']
+                    name2 = '后天'
+
+                print("Display weather...")
+                try:  # 加载天气图片
+                    bmp = Image.open(os.path.join(path + '/bmp', WEATHER[weather]))                    
+                    bmp.thumbnail((80, 80))
+                    image.paste(bmp, (216, 0))
+
+                    bmp = Image.open(os.path.join(path + '/bmp', WEATHER[cast1]))
+                    bmp.thumbnail((36, 36))
+                    image.paste(bmp, (218, 80))
+                    draw.text((224, 116), name1, font = font12, fill = 0)
+
+                    bmp = Image.open(os.path.join(path + '/bmp', WEATHER[cast2]))
+                    bmp.thumbnail((36, 36))
+                    image.paste(bmp, (258, 80))
+                    draw.text((264, 116), name2, font = font12, fill = 0)
+                except Exception as error:
+                    text += '%s ' % error
+
+                if text == '':  # 输出其它天气信息
+                    draw.text((0, 100), '%2d℃ %2d%' % (WEATHER['temperature'], WEATHER['humidity']), font = font24, fill = 0)
+        
+        if text != '':
+            draw.text((0, 100), text, font = font24, fill = 0)
+            text = ''  # 清空报错信息
+
         epd.display(epd.getbuffer(image))
-        
         time.sleep(1)
-        # Twinkle()
-        # time.sleep(0.5)
-        
 
     print("Clear...")
     epd.init(epd.lut_full_update)
