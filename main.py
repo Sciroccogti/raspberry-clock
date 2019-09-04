@@ -24,6 +24,8 @@ WEATHER = {u"小雨": "WXYU.BMP", u"中雨": "WZYU.BMP", u"大雨": "WDYU.BMP", 
            u"霾": "WFOG.BMP", u"雾": "WWU.BMP",
            u"雪": "WXUE.BMP", u"雨夹雪": "WYJX.BMP", u"冰雹": "WBBAO.BMP",
            u"月亮": "WMOON.BMP", u"深夜": "WSLEEP.BMP", u"日落": "SUMSET.BMP", u"日出": "SUNRISE.BMP"}
+           
+WEEK = {'1': u"一", '2': u"二", '3': u"三", '4': u"四", '5': u"五", '6': u"六", '0': u"日"}
 
 text = ''
 
@@ -42,8 +44,9 @@ except Exception as error:
 try:
     epd = epd2in9.EPD()
     print("init and Clear")
-    epd.init(epd.lut_partial_update)
+    epd.init(epd.lut_full_update)
     epd.Clear(0xFF)
+    epd.init(epd.lut_partial_update)
     # font48 = ImageFont.truetype('/usr/share/fonts/truetype/wqy/wqy-microhei.ttc', 48) # 数字宽度25，半角宽度12
     # font24 = ImageFont.truetype('/usr/share/fonts/truetype/wqy/wqy-microhei.ttc', 24)
     # font18 = ImageFont.truetype('/usr/share/fonts/truetype/wqy/wqy-microhei.ttc', 18)
@@ -60,11 +63,11 @@ try:
         hour = int(time.strftime('%H'))
         if min != lastmin:
             print("Display Time...")
-            newimage = Image.new('1', (110, 40), 255)
+            newimage = Image.new('1', (108, 48), 255)
             newdraw = ImageDraw.Draw(newimage)
-            newdraw.rectangle((1, 0, 108, 44), fill = 255)
-            newdraw.text((0, 0), '%02d %02d' % (hour, min), font = font48, fill = 0)
-            #newdraw.text((0, 60), '%02d' % min, font = font48, fill = 255)
+            #newdraw.rectangle((1, 0, 108, 48), fill = 0)
+            newdraw.text((4, 4), '%02d' % hour, font = font48, fill = 0)
+            newdraw.text((58, 4), '%02d' % min, font = font48, fill = 0)
             newimage = newimage.resize((216, 96))
             image.paste(newimage, (0, 0))
             lastmin = min
@@ -103,8 +106,9 @@ try:
                     name2 = '后天'
 
                 print("Display weather...")
+                draw.rectangle((216, 0, 296, 128), fill = 255)
                 try:  # 加载天气图片
-                    bmp = Image.open(os.path.join(path + '/bmp', WEATHER[weather]))                    
+                    bmp = Image.open(os.path.join(path + '/bmp', WEATHER[weather]))
                     bmp.thumbnail((80, 80))
                     image.paste(bmp, (216, 0))
 
@@ -121,9 +125,14 @@ try:
                     text += '%s ' % error
 
                 if text == '':  # 输出其它天气信息
-                    draw.text((0, 100), '%2d℃ %2d%' % (WEATHER['temperature'], WEATHER['humidity']), font = font24, fill = 0)
+                    draw.rectangle((0, 96, 214, 127), fill = 255, outline = 0)
+                    info = '%2s°C %2s%% ' % (now['lives'][0]['temperature'], now['lives'][0]['humidity'])
+                    info += time.strftime('%m/%d ')
+                    info += '%s' % WEEK[time.strftime('%w')]
+                    draw.text((6, 98), info, font = font24, fill = 0)
         
         if text != '':
+            draw.rectangle((0, 100, 216, 128), fill = 255)
             draw.text((0, 100), text, font = font24, fill = 0)
             text = ''  # 清空报错信息
 
