@@ -129,7 +129,7 @@ try:
                     info = '%2s°C %2s%% ' % (now['lives'][0]['temperature'], now['lives'][0]['humidity'])
                     info += time.strftime('%m/%d ')
                     info += '%s' % WEEK[time.strftime('%w')]
-                    draw.text((6, 98), info, font = font24, fill = 0)
+                    draw.text((4, 98), info, font = font24, fill = 0)
         
         if text != '':
             draw.rectangle((0, 100, 216, 128), fill = 255)
