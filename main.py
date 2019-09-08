@@ -8,22 +8,21 @@ import traceback
 import threading
 import RPi.GPIO as GPIO
 
-from waveshare import epd2in9
-from weather.service import GetWeatherInfo
-# picdir = os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), 'pic')
-# libdir = os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), 'lib')
-# if os.path.exists(libdir):
-#     sys.path.append(libdir)
-path = os.path.dirname(os.path.realpath(__file__))
-
 print("raspberrypi clock")
 
+from waveshare import epd2in9
+from weather.service import GetWeatherInfo
+import Adafruit_DHT
+
+path = os.path.dirname(os.path.realpath(__file__))
+sensor = Adafruit_DHT.DHT11
+pin = 4
+
 WEATHER = {u"小雨": "WXYU.BMP", u"中雨": "WZYU.BMP", u"大雨": "WDYU.BMP", u"暴雨": "WWET.BMP",
-           u"晴": "WQING.BMP", u"多云": "WDYZQ.BMP", u"阴": "WYIN.BMP",
-           u"雷阵雨": "WLZYU.BMP", u"阵雨": "WYGTQ.BMP",
-           u"霾": "WFOG.BMP", u"雾": "WWU.BMP",
-           u"雪": "WXUE.BMP", u"雨夹雪": "WYJX.BMP", u"冰雹": "WBBAO.BMP",
-           u"月亮": "WMOON.BMP", u"深夜": "WSLEEP.BMP", u"日落": "SUMSET.BMP", u"日出": "SUNRISE.BMP"}
+           u"晴": "WQING.BMP", u"多云": "WDYZQ.BMP", u"阴": "WYIN.BMP", u"雷阵雨": "WLZYU.BMP",
+           u"阵雨": "WYGTQ.BMP", u"霾": "WFOG.BMP", u"雾": "WWU.BMP", u"雪": "WXUE.BMP",
+           u"雨夹雪": "WYJX.BMP", u"冰雹": "WBBAO.BMP", u"月亮": "WMOON.BMP", u"深夜": "WSLEEP.BMP",
+           u"日落": "SUMSET.BMP", u"日出": "SUNRISE.BMP"}
            
 WEEK = {'1': u"一", '2': u"二", '3': u"三", '4': u"四", '5': u"五", '6': u"六", '0': u"日"}
 
@@ -66,8 +65,8 @@ try:
             newimage = Image.new('1', (108, 48), 255)
             newdraw = ImageDraw.Draw(newimage)
             #newdraw.rectangle((1, 0, 108, 48), fill = 0)
-            newdraw.text((4, 4), '%02d' % hour, font = font48, fill = 0)
-            newdraw.text((58, 4), '%02d' % min, font = font48, fill = 0)
+            newdraw.text((2, 4), '%02d' % hour, font = font48, fill = 0)
+            newdraw.text((60, 4), '%02d' % min, font = font48, fill = 0)
             newimage = newimage.resize((216, 96))
             image.paste(newimage, (0, 0))
             lastmin = min
@@ -84,6 +83,7 @@ try:
             print("Fetch weather...")
             lasthour = hour
             fore, now, weathertext = GetWeatherInfo()
+            humidity, temperature = Adafruit_DHT.read_retry(sensor, pin)
             text += weathertext
             if text == '':  # 输出天气
                 weather = now['lives'][0]['weather']
@@ -126,7 +126,8 @@ try:
 
                 if text == '':  # 输出其它天气信息
                     draw.rectangle((0, 96, 214, 127), fill = 255, outline = 0)
-                    info = '%2s°C %2s%% ' % (now['lives'][0]['temperature'], now['lives'][0]['humidity'])
+                    #info = '%2s°C %2s%% ' % (now['lives'][0]['temperature'], now['lives'][0]['humidity'])
+                    info = '%2dC %2d%% ' % (temperature, humidity)
                     info += time.strftime('%m/%d ')
                     info += '%s' % WEEK[time.strftime('%w')]
                     draw.text((4, 98), info, font = font24, fill = 0)
@@ -151,6 +152,7 @@ except IOError as e:
 
 except KeyboardInterrupt:    
     print("ctrl + c:")
+    GPIO.cleanup()
     epd.init(epd.lut_full_update)
     epd.Clear(0xFF)    
     print("Goto Sleep...")
