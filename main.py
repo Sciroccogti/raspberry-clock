@@ -27,8 +27,8 @@ WEATHER = {u"小雨": "WXYU.BMP", u"中雨": "WZYU.BMP", u"大雨": "WDYU.BMP", 
            
 WEEK = {'1': u"一", '2': u"二", '3': u"三", '4': u"四", '5': u"五", '6': u"六", '0': u"日"}
 
-HAPPY = ['^_^', '^o^', '\^o^/']
-SAD = ['-_-', '>_<', 'TAT']
+HAPPY = ['^_^', '^o^', '∩_∩']
+SAD = ['-_-', '~_~', 'TAT']
 
 text = ''
 
@@ -44,6 +44,8 @@ else:
     mintemp = 18
 
 try:
+    fon8 = ImageFont.truetype(path + '/4fun.ttf', 8)
+    font8 = ImageFont.truetype(path + '/Font.ttc', 8)
     font12 = ImageFont.truetype(path + '/Font.ttc', 12)
     # font18 = ImageFont.truetype(path + '/Font.ttc', 18)
     font24 = ImageFont.truetype(path + '/Font.ttc', 24)
@@ -81,16 +83,16 @@ try:
             newdraw = ImageDraw.Draw(newimage)
             
             humidity, temperature = Adafruit_DHT.read_retry(sensor, pin)
-            newdraw.text((50, 4), '%02d°C' % temperature, font = font12, fill = 0)
-            newdraw.text((50, 16), '%02d%%' % humidity, font = font12, fill = 0)
+            newdraw.text((96, 4), '%02d' % temperature, font = fon8, fill = 0)
+            newdraw.text((96, 20), '%02d' % humidity, font = fon8, fill = 0)
             if (humidity <= maxhum and humidity >= minhum and temperature <= maxtemp and temperature >= mintemp):
-                face = HAPPY[random.randint(1, 3)]
+                face = HAPPY[random.randint(0, 2)]
             else:
-                face = SAD[random.randint(1, 3)]
-            newdraw.text((50, 30), face, font = font12, fill = 0)
+                face = SAD[random.randint(0, 2)]
+            newdraw.text((95, 33), face, font = font8, fill = 0)
             #newdraw.rectangle((1, 0, 108, 48), fill = 0)
             newdraw.text((2, 4), '%02d' % hour, font = font48, fill = 0)
-            newdraw.text((60, 4), '%02d' % min, font = font48, fill = 0)
+            newdraw.text((50, 4), '%02d' % min, font = font48, fill = 0)
             newimage = newimage.resize((216, 96))
             image.paste(newimage, (0, 0))
             lastmin = min
