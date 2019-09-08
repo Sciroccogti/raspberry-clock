@@ -6,6 +6,7 @@ import time
 from PIL import Image,ImageDraw,ImageFont
 import traceback
 import threading
+import random
 import RPi.GPIO as GPIO
 
 print("raspberrypi clock")
@@ -26,7 +27,21 @@ WEATHER = {u"小雨": "WXYU.BMP", u"中雨": "WZYU.BMP", u"大雨": "WDYU.BMP", 
            
 WEEK = {'1': u"一", '2': u"二", '3': u"三", '4': u"四", '5': u"五", '6': u"六", '0': u"日"}
 
+HAPPY = ['^_^', '^o^', '\^o^/']
+SAD = ['-_-', '>_<', 'TAT']
+
 text = ''
+
+if abs(int(time.strftime('%m')) - 7) < 3:
+    maxhum = 60
+    minhum = 30
+    maxtemp = 28
+    mintemp = 23
+else:
+    maxhum = 80
+    minhum = 30
+    maxtemp = 25
+    mintemp = 18
 
 try:
     font12 = ImageFont.truetype(path + '/Font.ttc', 12)
@@ -64,6 +79,15 @@ try:
             print("Display Time...")
             newimage = Image.new('1', (108, 48), 255)
             newdraw = ImageDraw.Draw(newimage)
+            
+            humidity, temperature = Adafruit_DHT.read_retry(sensor, pin)
+            newdraw.text((50, 4), '%02d°C' % temperature, font = font12, fill = 0)
+            newdraw.text((50, 16), '%02d%%' % humidity, font = font12, fill = 0)
+            if (humidity <= maxhum and humidity >= minhum and temperature <= maxtemp and temperature >= mintemp):
+                face = HAPPY[random.randint(1, 3)]
+            else:
+                face = SAD[random.randint(1, 3)]
+            newdraw.text((50, 30), face, font = font12, fill = 0)
             #newdraw.rectangle((1, 0, 108, 48), fill = 0)
             newdraw.text((2, 4), '%02d' % hour, font = font48, fill = 0)
             newdraw.text((60, 4), '%02d' % min, font = font48, fill = 0)
@@ -83,7 +107,6 @@ try:
             print("Fetch weather...")
             lasthour = hour
             fore, now, weathertext = GetWeatherInfo()
-            humidity, temperature = Adafruit_DHT.read_retry(sensor, pin)
             text += weathertext
             if text == '':  # 输出天气
                 weather = now['lives'][0]['weather']
@@ -126,8 +149,8 @@ try:
 
                 if text == '':  # 输出其它天气信息
                     draw.rectangle((0, 96, 214, 127), fill = 255, outline = 0)
-                    #info = '%2s°C %2s%% ' % (now['lives'][0]['temperature'], now['lives'][0]['humidity'])
-                    info = '%2dC %2d%% ' % (temperature, humidity)
+                    info = '%2s°C %2s%% ' % (now['lives'][0]['temperature'], now['lives'][0]['humidity'])
+                    #info = '%2d°C %2d%% ' % (temperature, humidity)
                     info += time.strftime('%m/%d ')
                     info += '%s' % WEEK[time.strftime('%w')]
                     draw.text((4, 98), info, font = font24, fill = 0)
