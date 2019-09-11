@@ -13,18 +13,11 @@ print("raspberrypi clock")
 
 from waveshare import epd2in9
 from weather.service import GetWeatherInfo
-
-#import Adafruit_DHT
+import Adafruit_DHT
 
 path = os.path.dirname(os.path.realpath(__file__))
-#sensor = Adafruit_DHT.DHT11
-pin = 4
-GPIO.setmode(GPIO.BCM)
-GPIO.setup(21, GPIO.OUT)
-#pwm = GPIO.PWM(21, 50)
-
-import Adafruit_DHT
 sensor = Adafruit_DHT.DHT11
+pin = 4
 
 WEATHER = {u"小雨": "WXYU.BMP", u"中雨": "WZYU.BMP", u"大雨": "WDYU.BMP", u"暴雨": "WWET.BMP",
            u"晴": "WQING.BMP", u"多云": "WDYZQ.BMP", u"阴": "WYIN.BMP", u"雷阵雨": "WLZYU.BMP",
@@ -34,8 +27,8 @@ WEATHER = {u"小雨": "WXYU.BMP", u"中雨": "WZYU.BMP", u"大雨": "WDYU.BMP", 
            
 WEEK = {'1': u"一", '2': u"二", '3': u"三", '4': u"四", '5': u"五", '6': u"六", '0': u"日"}
 
-HAPPY = ['^_^', '^o^', '!o!']
-SAD = ['-_-', '~_~', 'TAT']
+HAPPY = ['^_^', '^o^', ' font8 = ImageFont.truetype(path + '/4fun.ttf', 8)']
+SAD = ['-_-', '>o<', 'TAT']
 
 text = ''
 
@@ -90,27 +83,22 @@ try:
             newdraw = ImageDraw.Draw(newimage)
             
             humidity, temperature = Adafruit_DHT.read_retry(sensor, pin)
-            newdraw.text((96, 4), '%02d' % temperature, font = fon8, fill = 0)
-            newdraw.text((96, 20), '%02d' % humidity, font = fon8, fill = 0)
+            newdraw.text((99, 4), '%02d' % temperature, font = fon8, fill = 0)
+            newdraw.text((99, 20), '%02d' % humidity, font = fon8, fill = 0)
             if (humidity <= maxhum and humidity >= minhum and temperature <= maxtemp and temperature >= mintemp):
                 face = HAPPY[random.randint(0, 2)]
             else:
                 face = SAD[random.randint(0, 2)]
-            newdraw.text((95, 33), face, font = font8, fill = 0)
+            newdraw.text((98, 32), face, font = font8, fill = 0)
             #newdraw.rectangle((1, 0, 108, 48), fill = 0)
-            newdraw.text((2, 4), '%02d' % hour, font = font48, fill = 0)
-            newdraw.text((50, 4), '%02d' % min, font = font48, fill = 0)
+            newdraw.text((1, 4), '%02d' % hour, font = font48, fill = 0)
+            newdraw.text((49, 4), '%02d' % min, font = font48, fill = 0)
             newimage = newimage.resize((216, 96))
             image.paste(newimage, (0, 0))
             lastmin = min
         
-        if hour >= 20:
-            GPIO.output(21, GPIO.HIGH) #BCM
-            #pwm.start(100)
-        else:
-            GPIO.output(21, GPIO.LOW)
-            #pwm.stop()
-
+        # if hour > 20:
+        #     GPIO.output(4, GPIO.HIGH)#BCM
         if hour % 6 == 0 and min <= 0 and sec <= 1:  # 每六小时刷新屏幕
             print("Clear...")
             epd.init(epd.lut_full_update)
