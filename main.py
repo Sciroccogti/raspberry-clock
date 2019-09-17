@@ -21,7 +21,8 @@ path = os.path.dirname(os.path.realpath(__file__))
 pin = 4
 GPIO.setmode(GPIO.BCM)
 GPIO.setup(21, GPIO.OUT)
-#pwm = GPIO.PWM(21, 50)
+pwm = GPIO.PWM(21, 100)
+pwm.start(0)
 
 import Adafruit_DHT
 sensor = Adafruit_DHT.DHT11
@@ -104,12 +105,16 @@ try:
             image.paste(newimage, (0, 0))
             lastmin = min
         
-        if hour >= 20:
-            GPIO.output(21, GPIO.HIGH) #BCM
-            #pwm.start(100)
+        if hour >= 20 and not (hour == 23 and min >= 30):
+            #GPIO.output(21, GPIO.HIGH) #BCM
+            pwm.ChangeDutyCycle(100)
+        elif hour < 4:
+            #GPIO.output(21, GPIO.LOW)
+            pwm.ChangeDutyCycle(1 - (hour + min/60) / 4)
+        elif hour >= 18:
+            pwm.ChangeDutyCycle((hour- 18 + min/60) / 2)
         else:
-            GPIO.output(21, GPIO.LOW)
-            #pwm.stop()
+            pwm.ChangeDutyCycle(0)
 
         if hour % 6 == 0 and min <= 0 and sec <= 1:  # 每六小时刷新屏幕
             print("Clear...")
@@ -192,6 +197,14 @@ except KeyboardInterrupt:
     GPIO.cleanup()
     epd.init(epd.lut_full_update)
     epd.Clear(0xFF)    
+    print("Goto Sleep...")
+    epd.sleep()
+    exit()
+
+except:
+    GPIO.cleanup()
+    epd.init(epd.lut_full_update)
+    epd.Clear(0xFF)
     print("Goto Sleep...")
     epd.sleep()
     exit()
