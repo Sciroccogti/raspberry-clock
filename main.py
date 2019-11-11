@@ -17,7 +17,7 @@ from weather.service import GetWeatherInfo
 path = os.path.dirname(os.path.realpath(__file__))
 pin = 4
 pi = pigpio.pi()
-pi.set_PWM_dutycycle(21, 0) # duty = 32/256, duty <=255/256
+pi.set_PWM_dutycycle(21, 4) # duty = 32/256, duty <=255/256
 
 import Adafruit_DHT
 sensor = Adafruit_DHT.DHT11
@@ -90,9 +90,9 @@ try:
         
         if sec < 5 and not min % 5:
             if hour < 8:
-                pi.set_PWM_dutycycle(21, 64 + (hour + min/60) * 24)
+                pi.set_PWM_dutycycle(21, 4 + (hour + min/60) * 12)
             elif hour >= 18:
-                pi.set_PWM_dutycycle(21, 256 - (hour + min/60 - 16) * 24)
+                pi.set_PWM_dutycycle(21, 100 - (hour + min/60 - 16) * 12)
             else:
                 pi.set_PWM_dutycycle(21, 0)
 
