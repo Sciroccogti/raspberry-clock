@@ -1,12 +1,16 @@
 import time
-import RPi.GPIO as GPIO
+import pigpio
+#import RPi.GPIO as GPIO
 
 print("led control")
 
-GPIO.setmode(GPIO.BCM)
-GPIO.setup(21, GPIO.OUT)
-pwm = GPIO.PWM(21, 120)  # set frequency as 120Hz
-pwm.start(30)  # set duty as 100
+pi = pigpio.pi()
+pi.set_PWM_dutycycle(18,  64)
+
+#GPIO.setmode(GPIO.BCM)
+#GPIO.setup(18, GPIO.OUT)
+#pwm = GPIO.PWM(18, 120)  # set frequency as 120Hz
+#pwm.start(30)  # set duty as 100
 
 try:
     while(True):
@@ -27,4 +31,4 @@ try:
 
 except KeyboardInterrupt:
     print("ctrl + c:")
-    GPIO.cleanup()
+    #GPIO.cleanup()
