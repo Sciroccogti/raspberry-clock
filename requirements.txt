@@ -1,0 +1,5 @@
+requests==2.18.4
+Adafruit_DHT==1.4.0
+Pillow==6.2.1
+pigpio==1.44
+spidev==3.4
