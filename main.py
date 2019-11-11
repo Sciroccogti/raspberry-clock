@@ -7,29 +7,20 @@ from PIL import Image,ImageDraw,ImageFont
 import traceback
 import threading
 import random
-import RPi.GPIO as GPIO
+import pigpio # BCM
 
 print("raspberrypi clock")
 
 from waveshare import epd2in9
 from weather.service import GetWeatherInfo
 
-#import Adafruit_DHT
-
 path = os.path.dirname(os.path.realpath(__file__))
-#sensor = Adafruit_DHT.DHT11
 pin = 4
-#GPIO.setmode(GPIO.BCM)
-#GPIO.setup(21, GPIO.OUT)
-#pwm = GPIO.PWM(21, 120)
-#pwm.start(0)
+pi = pigpio.pi()
+pi.set_PWM_dutycycle(21, 0) # duty = 32/256, duty <=255/256
 
 import Adafruit_DHT
 sensor = Adafruit_DHT.DHT11
-
-#def fun_timer():
-#    global timer
-#    timer = threading.Timer()
 
 WEATHER = {u"小雨": "WXYU.BMP", u"中雨": "WZYU.BMP", u"大雨": "WDYU.BMP", u"暴雨": "WWET.BMP",
            u"晴": "WQING.BMP", u"多云": "WDYZQ.BMP", u"阴": "WYIN.BMP", u"雷阵雨": "WLZYU.BMP",
@@ -59,12 +50,7 @@ try:
     fon8 = ImageFont.truetype(path + '/4fun.ttf', 8)
     font8 = ImageFont.truetype(path + '/Font.ttc', 8)
     font12 = ImageFont.truetype(path + '/Font.ttc', 12)
-    # font18 = ImageFont.truetype(path + '/Font.ttc', 18)
     font24 = ImageFont.truetype(path + '/Font.ttc', 24)
-    # font36 = ImageFont.truetype(path + '/Font.ttc', 36)
-    # font48 = ImageFont.truetype(path + '/Font.ttc', 48)
-    # font60 = ImageFont.truetype(path + '/Font.ttc', 60)
-    # font72 = ImageFont.truetype(path + '/Font.ttc', 72)
     font48 = ImageFont.truetype(path + '/4fun.ttf', 48)
 except Exception as error:
     text += '%s' % error
@@ -75,12 +61,6 @@ try:
     epd.init(epd.lut_full_update)
     epd.Clear(0xFF)
     epd.init(epd.lut_partial_update)
-    # font48 = ImageFont.truetype('/usr/share/fonts/truetype/wqy/wqy-microhei.ttc', 48) # 数字宽度25，半角宽度12
-    # font24 = ImageFont.truetype('/usr/share/fonts/truetype/wqy/wqy-microhei.ttc', 24)
-    # font18 = ImageFont.truetype('/usr/share/fonts/truetype/wqy/wqy-microhei.ttc', 18)
-
-    # timer = threading.Timer(1, fun_timer)
-    # timer.start()
     image = Image.new('1', (epd.height, epd.width), 255)
     draw = ImageDraw.Draw(image)
     lastmin = -1
@@ -102,25 +82,21 @@ try:
             else:
                 face = SAD[random.randint(0, 2)]
             newdraw.text((95, 33), face, font = font8, fill = 0)
-            #newdraw.rectangle((1, 0, 108, 48), fill = 0)
             newdraw.text((2, 4), '%02d' % hour, font = font48, fill = 0)
             newdraw.text((50, 4), '%02d' % min, font = font48, fill = 0)
             newimage = newimage.resize((216, 96))
             image.paste(newimage, (0, 0))
             lastmin = min
         
-        #if sec < 5 and not min % 5:
-        #    if hour >= 20 and not (hour == 23 and min >= 30):
-        #        #GPIO.output(21, GPIO.HIGH) #BCM
-        #        pwm.ChangeDutyCycle(100)
-        #    elif hour < 4:
-        #        #GPIO.output(21, GPIO.LOW)
-        #        pwm.ChangeDutyCycle(1 - (hour + min/60) / 4)
-        #    elif hour >= 18:
-        #        pwm.ChangeDutyCycle((hour- 18 + min/60) / 2)
-        #    else:
-        #        pwm.ChangeDutyCycle(0)
-        
+        if sec < 5 and not min % 5:
+            if hour < 8:
+                pi.set_PWM_dutycycle(21, 64 + (hour + min/60) * 24)
+            elif hour >= 18:
+                pi.set_PWM_dutycycle(21, 256 - (hour + min/60 - 16) * 24)
+            else:
+                pi.set_PWM_dutycycle(21, 0)
+
+
         if hour % 6 == 0 and min <= 0 and sec <= 1:  # 每六小时刷新屏幕
             print("Clear...")
             epd.init(epd.lut_full_update)
@@ -199,7 +175,7 @@ except IOError as e:
 
 except KeyboardInterrupt:    
     print("ctrl + c:")
-    GPIO.cleanup()
+    pi.set_PWM_dutycycle(21, 0)
     epd.init(epd.lut_full_update)
     epd.Clear(0xFF)    
     print("Goto Sleep...")
@@ -207,8 +183,8 @@ except KeyboardInterrupt:
     exit()
 
 except:
-    GPIO.cleanup()
     epd.init(epd.lut_full_update)
+    pi.set_PWM_dutycycle(21, 0)
     epd.Clear(0xFF)
     print("Goto Sleep...")
     epd.sleep()
