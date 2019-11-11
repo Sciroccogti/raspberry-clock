@@ -21,11 +21,15 @@ path = os.path.dirname(os.path.realpath(__file__))
 pin = 4
 GPIO.setmode(GPIO.BCM)
 GPIO.setup(21, GPIO.OUT)
-pwm = GPIO.PWM(21, 100)
+pwm = GPIO.PWM(21, 120)
 pwm.start(0)
 
 import Adafruit_DHT
 sensor = Adafruit_DHT.DHT11
+
+#def fun_timer():
+#    global timer
+#    timer = threading.Timer()
 
 WEATHER = {u"小雨": "WXYU.BMP", u"中雨": "WZYU.BMP", u"大雨": "WDYU.BMP", u"暴雨": "WWET.BMP",
            u"晴": "WQING.BMP", u"多云": "WDYZQ.BMP", u"阴": "WYIN.BMP", u"雷阵雨": "WLZYU.BMP",
@@ -105,17 +109,18 @@ try:
             image.paste(newimage, (0, 0))
             lastmin = min
         
-        if hour >= 20 and not (hour == 23 and min >= 30):
-            #GPIO.output(21, GPIO.HIGH) #BCM
-            pwm.ChangeDutyCycle(100)
-        elif hour < 4:
-            #GPIO.output(21, GPIO.LOW)
-            pwm.ChangeDutyCycle(1 - (hour + min/60) / 4)
-        elif hour >= 18:
-            pwm.ChangeDutyCycle((hour- 18 + min/60) / 2)
-        else:
-            pwm.ChangeDutyCycle(0)
-
+        if sec < 5 and not min % 5:
+            if hour >= 20 and not (hour == 23 and min >= 30):
+                #GPIO.output(21, GPIO.HIGH) #BCM
+                pwm.ChangeDutyCycle(100)
+            elif hour < 4:
+                #GPIO.output(21, GPIO.LOW)
+                pwm.ChangeDutyCycle(1 - (hour + min/60) / 4)
+            elif hour >= 18:
+                pwm.ChangeDutyCycle((hour- 18 + min/60) / 2)
+            else:
+                pwm.ChangeDutyCycle(0)
+        
         if hour % 6 == 0 and min <= 0 and sec <= 1:  # 每六小时刷新屏幕
             print("Clear...")
             epd.init(epd.lut_full_update)
