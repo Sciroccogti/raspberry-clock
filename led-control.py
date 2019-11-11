@@ -6,7 +6,7 @@ print("led control")
 GPIO.setmode(GPIO.BCM)
 GPIO.setup(21, GPIO.OUT)
 pwm = GPIO.PWM(21, 120)  # set frequency as 120Hz
-pwm.start(100)  # 占空比0
+pwm.start(30)  # set duty as 100
 
 try:
     while(True):
