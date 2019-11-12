@@ -17,7 +17,7 @@ from weather.service import GetWeatherInfo
 path = os.path.dirname(os.path.realpath(__file__))
 pin = 4
 pi = pigpio.pi()
-pi.set_PWM_dutycycle(21, 4) # duty = 32/256, duty <=255/256
+pi.set_PWM_dutycycle(21, 10) # duty = 32/256, duty <=255/256
 
 import Adafruit_DHT
 sensor = Adafruit_DHT.DHT11
@@ -34,6 +34,7 @@ HAPPY = ['^_^', '^o^', '!o!']
 SAD = ['-_-', '~_~', 'TAT']
 
 text = ''
+haderror = False
 
 if abs(int(time.strftime('%m')) - 7) < 3:
     maxhum = 60
@@ -73,7 +74,7 @@ try:
             print("Display Time...")
             newimage = Image.new('1', (108, 48), 255)
             newdraw = ImageDraw.Draw(newimage)
-            
+            print("Fetch DHT11...")
             humidity, temperature = Adafruit_DHT.read_retry(sensor, pin)
             newdraw.text((96, 4), '%02d' % temperature, font = fon8, fill = 0)
             newdraw.text((96, 20), '%02d' % humidity, font = fon8, fill = 0)
@@ -88,14 +89,15 @@ try:
             image.paste(newimage, (0, 0))
             lastmin = min
         
-        if sec < 5 and not min % 5:
+        if sec <= 1:
+            print("setting LED")
+            t = hour + min / 60
             if hour < 8:
-                pi.set_PWM_dutycycle(21, 4 + (hour + min/60) * 12)
+                pi.set_PWM_dutycycle(21, t * t * 2)
             elif hour >= 18:
-                pi.set_PWM_dutycycle(21, 100 - (hour + min/60 - 16) * 12)
+                pi.set_PWM_dutycycle(21, (24 - t) * (24 - t) * 2)
             else:
                 pi.set_PWM_dutycycle(21, 0)
-
 
         if hour % 6 == 0 and min <= 0 and sec <= 1:  # 每六小时刷新屏幕
             print("Clear...")
@@ -103,7 +105,8 @@ try:
             epd.Clear(0xFF)
             epd.init(epd.lut_partial_update)
 
-        if lasthour != hour: # 整点
+        if lasthour != hour or haderror: # 整点 or error lasttime
+            haderror = False
             print("Fetch weather...")
             lasthour = hour
             fore, now, weathertext = GetWeatherInfo()
@@ -158,6 +161,7 @@ try:
         if text != '':
             draw.rectangle((0, 100, 216, 128), fill = 255)
             draw.text((0, 100), text, font = font24, fill = 0)
+            haderror = True
             text = ''  # 清空报错信息
 
         epd.display(epd.getbuffer(image))
