@@ -107,7 +107,7 @@ try:
             epd.Clear(0xFF)
             epd.init(epd.lut_partial_update)
 
-        if lasthour != hour or haderror: # 整点 or error lasttime
+        if haderror or lasthour != hour: # 整点 or error lasttime
             print("haderror=" , haderror)
             haderror = False
             print("Fetch weather...")
@@ -162,6 +162,7 @@ try:
                     draw.text((4, 98), info, font = font24, fill = 0)
         
         if text != '':
+            text = str(haderror) + text
             draw.rectangle((0, 100, 216, 128), fill = 255)
             draw.text((0, 100), text, font = font24, fill = 0)
             haderror = True
