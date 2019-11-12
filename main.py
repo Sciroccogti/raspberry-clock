@@ -75,7 +75,9 @@ try:
             newimage = Image.new('1', (108, 48), 255)
             newdraw = ImageDraw.Draw(newimage)
             print("Fetch DHT11...")
+            #humidity = temperature = 66
             humidity, temperature = Adafruit_DHT.read_retry(sensor, pin)
+            print('%02d' % temperature, '%02d' % humidity)
             newdraw.text((96, 4), '%02d' % temperature, font = fon8, fill = 0)
             newdraw.text((96, 20), '%02d' % humidity, font = fon8, fill = 0)
             if (humidity <= maxhum and humidity >= minhum and temperature <= maxtemp and temperature >= mintemp):
@@ -89,7 +91,7 @@ try:
             image.paste(newimage, (0, 0))
             lastmin = min
         
-        if sec <= 1:
+        if sec <= 1 or lasthour == -1:
             print("setting LED")
             t = hour + min / 60
             if hour < 8:
@@ -106,6 +108,7 @@ try:
             epd.init(epd.lut_partial_update)
 
         if lasthour != hour or haderror: # 整点 or error lasttime
+            print("haderror=" , haderror)
             haderror = False
             print("Fetch weather...")
             lasthour = hour
