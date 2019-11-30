@@ -43,6 +43,7 @@ def render(video_path, frame_number):
         epd.init(epd.lut_partial_update)
 
         for i in range(frame_count):
+            print('display frame %d' % i)
             cap.set(cv2.CAP_PROP_POS_FRAMES, i)
             ret, cv_frame = cap.read()
             if not ret:
