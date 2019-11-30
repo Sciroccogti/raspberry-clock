@@ -43,9 +43,10 @@ def render(video_path, frame_number):
         epd.init(epd.lut_full_update)
         epd.Clear(0xFF)
         epd.init(epd.lut_partial_update)
+        pbar = tqdm(total=frame_count)
 
         for i in trange(frame_count):
-            tqdm.set_description("displaying frame %d/%d" % (i, frame_count))
+            pbar.set_description("displaying frame %d/%d" % (i, frame_count))
             cap.set(cv2.CAP_PROP_POS_FRAMES, i)
             ret, cv_frame = cap.read()
             if not ret:
