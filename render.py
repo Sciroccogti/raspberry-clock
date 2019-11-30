@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import sys
 import cv2
+from tqdm import tqdm, trange
 from waveshare import epd2in9
 from PIL import Image
 
@@ -35,15 +36,16 @@ def render(video_path, frame_number):
         epd.init(epd.lut_full_update)
         epd.display(epd.getbuffer(padded_image))
         epd.sleep()
+
     else:
         epd = epd2in9.EPD()
-        print("init and Clear")
+        print("init and clear")
         epd.init(epd.lut_full_update)
         epd.Clear(0xFF)
         epd.init(epd.lut_partial_update)
 
-        for i in range(frame_count):
-            print('display frame %d' % i)
+        for i in trange(frame_count):
+            tqdm.set_description("displaying frame %d/%d" % (i, frame_count))
             cap.set(cv2.CAP_PROP_POS_FRAMES, i)
             ret, cv_frame = cap.read()
             if not ret:
@@ -59,7 +61,7 @@ def render(video_path, frame_number):
             padded_image.paste(image, (x_offset, y_offset))
 
             epd.display(epd.getbuffer(padded_image))
-            
+
         epd.sleep()
 
 
