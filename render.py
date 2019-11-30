@@ -71,4 +71,12 @@ if __name__ == "__main__":
         frame_number = int(sys.argv[2])
     else: # play entire video
         frame_number = -1
-    render(video_path, frame_number)
+    try:
+        render(video_path, frame_number)
+    except KeyboardInterrupt:    
+        print("ctrl + c:")
+        epd.init(epd.lut_full_update)
+        epd.Clear(0xFF)    
+        print("Goto Sleep...")
+        epd.sleep()
+        exit()
