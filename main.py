@@ -26,7 +26,7 @@ WEATHER = {u"小雨": "WXYU.BMP", u"中雨": "WZYU.BMP", u"大雨": "WDYU.BMP", 
            u"晴": "WQING.BMP", u"多云": "WDYZQ.BMP", u"阴": "WYIN.BMP", u"雷阵雨": "WLZYU.BMP",
            u"阵雨": "WYGTQ.BMP", u"霾": "WFOG.BMP", u"雾": "WWU.BMP", u"雪": "WXUE.BMP",
            u"雨夹雪": "WYJX.BMP", u"冰雹": "WBBAO.BMP", u"月亮": "WMOON.BMP", u"深夜": "WSLEEP.BMP",
-           u"日落": "SUMSET.BMP", u"日出": "SUNRISE.BMP"}
+           u"日落": "SUMSET.BMP", u"日出": "SUNRISE.BMP", u"雨": "WZYU.BMP"}
            
 WEEK = {'1': u"一", '2': u"二", '3': u"三", '4': u"四", '5': u"五", '6': u"六", '0': u"日"}
 
