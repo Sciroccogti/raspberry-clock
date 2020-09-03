@@ -26,7 +26,7 @@ WEATHER = {u"小雨": "WXYU.BMP", u"中雨": "WZYU.BMP", u"大雨": "WDYU.BMP", 
            u"晴": "WQING.BMP", u"多云": "WDYZQ.BMP", u"阴": "WYIN.BMP", u"雷阵雨": "WLZYU.BMP",
            u"阵雨": "WYGTQ.BMP", u"霾": "WFOG.BMP", u"雾": "WWU.BMP", u"雪": "WXUE.BMP",
            u"雨夹雪": "WYJX.BMP", u"冰雹": "WBBAO.BMP", u"月亮": "WMOON.BMP", u"深夜": "WSLEEP.BMP",
-           u"日落": "SUMSET.BMP", u"日出": "SUNRISE.BMP"}
+           u"日落": "SUMSET.BMP", u"日出": "SUNRISE.BMP", u"雨": "WZYU.BMP"}
            
 WEEK = {'1': u"一", '2': u"二", '3': u"三", '4': u"四", '5': u"五", '6': u"六", '0': u"日"}
 
@@ -34,7 +34,7 @@ HAPPY = ['^_^', '^o^', '!o!']
 SAD = ['-_-', '~_~', 'TAT']
 
 text = ''
-haderror = False
+err_count = 0
 
 if abs(int(time.strftime('%m')) - 7) < 3:
     maxhum = 60
@@ -64,8 +64,10 @@ try:
     epd.init(epd.lut_partial_update)
     image = Image.new('1', (epd.height, epd.width), 255)
     draw = ImageDraw.Draw(image)
+    lastsec = -1
     lastmin = -1
     lasthour = -1
+    time.sleep(10)
     while (True):
         sec = int(time.strftime('%S'))
         min = int(time.strftime('%M'))
@@ -89,7 +91,6 @@ try:
             newdraw.text((50, 4), '%02d' % min, font = font48, fill = 0)
             newimage = newimage.resize((216, 96))
             image.paste(newimage, (0, 0))
-            lastmin = min
         
         if sec <= 1 or lasthour == -1:
             print("setting LED")
@@ -107,11 +108,9 @@ try:
             epd.Clear(0xFF)
             epd.init(epd.lut_partial_update)
 
-        if haderror or lasthour != hour: # 整点 or error lasttime
-            print("haderror=" , haderror)
-            haderror = False
+        if (err_count > 0 and err_count < 10 and lastsec != sec and lastsec != -1) or lasthour != hour: # 整点 or error lasttime
+            print("err_count=" , err_count)
             print("Fetch weather...")
-            lasthour = hour
             fore, now, weathertext = GetWeatherInfo()
             text += weathertext
             if text == '':  # 输出天气
@@ -162,14 +161,21 @@ try:
                     draw.text((4, 98), info, font = font24, fill = 0)
         
         if text != '':
-            text = str(haderror) + text
+            text = str(err_count) + text
             draw.rectangle((0, 100, 216, 128), fill = 255)
             draw.text((0, 100), text, font = font24, fill = 0)
-            haderror = True
+            err_count += 1
             text = ''  # 清空报错信息
+            if err_count >= 10:
+                sys.exit(0)
+        else:
+            err_count = 0
 
         epd.display(epd.getbuffer(image))
         time.sleep(1)
+        lastsec = sec
+        lastmin = min
+        lasthour = hour
 
     print("Clear...")
     epd.init(epd.lut_full_update)
