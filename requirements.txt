@@ -1,4 +1,4 @@
-requests==2.20.0
+requests==2.31.0
 Adafruit_DHT==1.4.0
 Pillow>=7.1.0
 pigpio==1.44
